@@ -1,0 +1,10 @@
+# things I'm not sure I can legally redistribute
+libmbed
+
+# build artefacts
+*.o
+*.bin
+*.elf
+*.hex
+*.map
+*.lst
