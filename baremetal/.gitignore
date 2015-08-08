@@ -9,3 +9,4 @@ lpc175x_6x_cmsis_driver_library
 *.hex
 *.map
 *.lst
+*.dump
