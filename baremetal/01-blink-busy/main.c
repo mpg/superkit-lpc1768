@@ -17,11 +17,12 @@ void _reset(void)
 {
     /* GPIO: chapter 9 */
     LPC_GPIO1->FIODIR = LED1;       /* LED1 is Output */
+    LPC_GPIO1->FIOMASK = ~LED1;     /* operations only affect LED1 */
 
+    uint32_t op = LED1;
     while(1) {
-        LPC_GPIO1->FIOPIN |= LED1;
-        for (volatile uint32_t i = 0; i < REPS; i++);
-        LPC_GPIO1->FIOPIN &= ~LED1;
+        LPC_GPIO1->FIOPIN = op;
+        op = ~op;
         for (volatile uint32_t i = 0; i < REPS; i++);
     }
 }

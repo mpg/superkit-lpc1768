@@ -21,8 +21,8 @@ vtor:
 
 @ 9.5 GPIO registers
 .set fio1dir,   0x2009C020
-.set fio1set,   0x2009C038
-.set fio1clr,   0x2009C03C
+.set fio1mask,  0x2009C030
+.set fio1pin,   0x2009C034
 
 @ see Cortex-M3 technical reference manual 3.3.1 and wait: below
 @ assume the unconditional branch is easy to speculate so that the pipeline
@@ -39,24 +39,20 @@ main:
     ldr r0, =led1
     ldr r1, =fio1dir
     str r0, [r1]        @ led1 is output
-blink1:
-    ldr r1, =fio1set
-    str r0, [r1]        @ set led1 on
+
+    mvn r0, r0
+    ldr r1, =fio1mask
+    str r0, [r1]        @ operations only affect led1
+
+blink:
+    mvn r0, r0          @ switch between on and off
+    ldr r1, =fio1pin
+    str r0, [r1]        @ set led1 on or off
 
     ldr r1, =wait_reps
-wait1:
+wait:
     sub r1, #1          @ 1 cycle
-    beq blink2          @ 1 cycle if not taken
-    b wait1             @ 1 cycle + pipeline refill (assume 2 total)
-
-blink2:
-    ldr r1, =fio1clr
-    str r0, [r1]        @ set led1 off
-
-    ldr r1, =wait_reps
-wait2:
-    sub r1, #1          @ 1 cycle
-    beq blink1          @ 1 cycle if not taken
-    b wait2             @ 1 cycle + pipeline refill (assume 2 total)
+    beq blink           @ 1 cycle if not taken
+    b wait              @ 1 cycle + pipeline refill (assume 2 total)
 
 @ vim: ft=armasm
