@@ -9,14 +9,6 @@
 @ Last bit must be set to one as this is a thumb function
 .set main_addr, 4 * nb_vtors + 1
 
-@ interrupt vector table (34.3.3.4)
-vtor:
-    .word   0           @ we won't use the stack
-    .word   main_addr
-.rept nb_vtors - 2
-    .word   0
-.endr
-
 @ Schematics, sheet 3/5: LED1 is P1.18
 @ 8.3 says GPIO is the default function
 .set led1,  1 << 18
@@ -26,6 +18,14 @@ vtor:
 .set dir_offt,  0x00
 .set mask_offt, 0x10
 .set pin_offt,  0x14
+
+@ interrupt vector table (34.3.3.4)
+vtor:
+    .word   fio1base    @ we won't use the stack, store something useful here
+    .word   main_addr
+.rept nb_vtors - 2
+    .word   0
+.endr
 
 @ see Cortex-M3 technical reference manual 3.3.1 and wait: below
 @ assume the unconditional branch is easy to speculate so that the pipeline
@@ -48,7 +48,7 @@ vtor:
 
 main:
     mov  r0, #led1
-    ldr  r1, =fio1base
+    ldr  r1, vtor               @ value of fio1base
     str  r0, [r1, #dir_offt]    @ led1 is output (all other are input)
 
 blink:
